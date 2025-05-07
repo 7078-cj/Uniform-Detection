@@ -100,11 +100,11 @@ class StudentDetailView(RetrieveUpdateDestroyAPIView):
 
 @api_view(['POST'])
 def qr_scanner_view(request):
-    file = request.FILES.get('file')
-    if not file:
+    image_file = request.FILES.get("image")
+    if not image_file:
         return Response({'error': 'No file provided'}, status=400)
 
-    decoded_data = qr_scanner(file)
+    decoded_data = qr_scanner(image_file)
     if not decoded_data:
         return Response({'error': 'Invalid or unreadable QR code'}, status=400)
 

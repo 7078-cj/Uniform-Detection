@@ -3,6 +3,7 @@ import qrcode.constants
 import cv2
 from io import BytesIO
 from django.core.files import File
+import numpy as np
 
 
 
@@ -24,12 +25,15 @@ def generate_and_save_qr_to_model(data, instance):
     instance.qr_code.save(f"{data}.png", File(buffer), save=False)
     
     
-def qr_scanner(img):
-
-    image = cv2.imread(img)
-
+def qr_scanner(img_file):
+    # Convert Django's InMemoryUploadedFile to a format OpenCV can read
+    img_array = np.frombuffer(img_file.read(), np.uint8)
+    image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+    
+    if image is None:
+        return None
+    
     qr_det = cv2.QRCodeDetector()
-
     decoded, _, _ = qr_det.detectAndDecode(image)
-
+    
     return decoded
