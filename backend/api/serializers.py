@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Student
+from .models import Student, StudentAttendance, StudentQR
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,8 +17,19 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
     
-class StudentSerializer(serializers.ModelSerializer):
+class StudentQRSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentQR
+        fields = "__all__"
+
+class StudentAttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentAttendance
+        fields = ['uniform', 'status']
     
+class StudentSerializer(serializers.ModelSerializer):
+    studentQr = StudentQRSerializer(read_only=True)
+    attendance_records = StudentAttendanceSerializer(many=True, read_only=True)
     fullName = serializers.CharField(read_only=True)
    
     class Meta:

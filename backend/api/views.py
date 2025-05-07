@@ -8,9 +8,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import UserSerializer, StudentSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Student
+from .models import Student, StudentQR, StudentAttendance
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+
+from .utils import generate_and_save_qr_to_model, qr_scanner
 
 # Create your views here.
 
@@ -67,15 +69,19 @@ class StudentView(ListCreateAPIView):
         return Student.objects.all().order_by('-created', '-update')  
 
     def perform_create(self, serializer):
-        
+        fullName = serializer.validated_data['firstName'] + ' ' + serializer.validated_data['middleInitial'] + '. ' + serializer.validated_data['lastName']
         user = User.objects.create_user(
-        username=serializer.validated_data['fullName'],
+        username= fullName,
         email=serializer.validated_data['email'],
         password=serializer.validated_data['password']  
         )
-
+        Student = serializer.save(user=user)
+        instance = StudentQR.objects.create(student=Student)
+        generate_and_save_qr_to_model(Student.studentCode, instance)
+        instance.save()
         
-        serializer.save(user=user)
+        
+        return Response(serializer.data, status=201)
         
 class StudentDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
@@ -90,3 +96,21 @@ class StudentDetailView(RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance):
         instance.delete()
+        
+
+@api_view(['POST'])
+def qr_scanner_view(request):
+    file = request.FILES.get('file')
+    if not file:
+        return Response({'error': 'No file provided'}, status=400)
+
+    decoded_data = qr_scanner(file)
+    if not decoded_data:
+        return Response({'error': 'Invalid or unreadable QR code'}, status=400)
+
+    student = Student.objects.filter(studentCode=decoded_data).first()
+    if student:
+        serializer = StudentSerializer(student)
+        return Response(serializer.data, status=200)
+    else:
+        return Response({'error': 'Student not found'}, status=404)

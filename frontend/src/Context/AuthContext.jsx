@@ -16,6 +16,10 @@ export function AuthProvider({children}) {
     const [user, setUser] = useState(
         JSON.parse(localStorage.getItem('user')) || null
     );
+
+    const [role, setRole] = useState(
+        JSON.parse(localStorage.getItem('role')) || null
+    )
     const nav = useNavigate()
 
     const url = "http://127.0.0.1:8000/api/";
@@ -34,10 +38,13 @@ export function AuthProvider({children}) {
 
             if (response.ok) {
                 const data = await response.json();
+                console.log(data)
                 setAuthTokens(data);
                 setUser(jwtDecode(data.access));
+                setRole(data.role);
                 localStorage.setItem('authTokens', JSON.stringify(data));
                 localStorage.setItem('user', JSON.stringify(jwtDecode(data.access)));
+                localStorage.setItem('role', JSON.stringify(data.role));
                 nav('/');
             } else {
                 // Handle login error (e.g., show an error message)
@@ -93,6 +100,7 @@ export function AuthProvider({children}) {
         loginUser:loginUser,
         logOut:logoutUser,
         user:user,
+        role:role,
         authTok:authTokens,
         
 

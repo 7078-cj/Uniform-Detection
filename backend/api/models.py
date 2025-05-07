@@ -19,3 +19,17 @@ class Student(models.Model):
     @property
     def fullName(self):
         return f'{self.firstName} {self.middleInitial}. {self.lastName}'
+
+class StudentQR(models.Model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name="studentQr")
+    qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    
+class StudentAttendance(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="attendance_records")
+    uniform = models.CharField(max_length=11, choices=[('Complete', 'Complete'), ('Incomeplete', 'Incomplete')])
+    status = models.CharField(max_length=10, choices=[('Present', 'Present'), ('Absent', 'Absent')])
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

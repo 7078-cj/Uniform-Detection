@@ -8,6 +8,9 @@ import LoginPage from './Pages/LoginPage'
 import RegisterPage from './Pages/RegisterPage'
 import Home from './Pages/Home'
 import PrivateRoutes from './Context/PrivateRoutes'
+import AdminPage from './Pages/AdminPage'
+import StudentPage from './Pages/StudentPage'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -21,6 +24,20 @@ function App() {
             <Route path='/' element={
               <PrivateRoutes>
                 <Home/>
+              </PrivateRoutes>}/>
+
+              <Route path='/admin' element={
+              <PrivateRoutes>
+                
+                  <AdminPage/>
+                
+              </PrivateRoutes>}/>
+
+              <Route path='/student' element={
+              <PrivateRoutes>
+                
+                  <StudentPage/>
+                
               </PrivateRoutes>}/>
 
             <Route path='/login' element={<LoginPage/>}/>
