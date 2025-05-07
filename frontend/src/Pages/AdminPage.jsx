@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import NavBar from '../Components/NavBar'
 import RegisterStudentForm from '../Components/RegisterStudentForm'
-import ScanPage from '../Context/ScanPage'
+import ScanPage from '../Components/ScanPage'
 
 function AdminPage() {
 

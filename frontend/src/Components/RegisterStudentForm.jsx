@@ -14,7 +14,7 @@ function RegisterStudentForm() {
             },
             body :JSON.stringify({
                                   'firstName' :e.target.firstName.value,
-                                  'middleInitial' :e.target.middleInital.value,
+                                  'middleInitial' :e.target.middleInitial.value,
                                   'lastName' :e.target.lastName.value,
                                   'studentCode' :e.target.studentCode.value,
                                   'course' :e.target.course.value,
