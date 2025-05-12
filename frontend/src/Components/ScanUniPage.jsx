@@ -5,7 +5,7 @@ import { Paper, Button, Title, Loader, Text } from "@mantine/core";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import classes from "../css/Scanner.module.css";
 
-function ScanPage() {
+function ScanUniPage() {
     const webcamRef = useRef(null);
     const [isScanning, setIsScanning] = useState(false);
     const [validationResult, setValidationResult] = useState(null);
@@ -63,7 +63,7 @@ function ScanPage() {
 
             setValidationResult({
               success: true,
-              message: `Student ID validated: ${result.fullName}`
+              message: `Student Uniform validated: ${result.fullName}`
             });
             // showNotification({
             //   title: "Scan Successful",
@@ -91,14 +91,14 @@ function ScanPage() {
 
   return (
     <div className={classes.scannerContainer}>
-      <Title className={classes.scannerTitle} order={3}>Student ID Scanner</Title>
+      <Title className={classes.scannerTitle} order={3}>Student Uniform Checker</Title>
       <Paper shadow="lg" radius="lg" p="xl" withBorder>
         <div className={classes.webcamContainer}>
           <Webcam
             ref={webcamRef}
             screenshotFormat="image/jpeg"
-            width={560}
-            height={400}
+            width={860}
+            height={600}
             videoConstraints={{
               width: 560,
               height: 400,
@@ -130,7 +130,7 @@ function ScanPage() {
           loading={isScanning}
           color={validationResult?.success === false ? "red" : "teal"}
         >
-          {isScanning ? 'Scanning...' : validationResult?.success === false ? 'Try Again' : 'Scan ID'}
+          {isScanning ? 'Scanning...' : validationResult?.success === false ? 'Try Again' : 'Scan Uniform'}
         </Button>
       </Paper>
     </div>
@@ -138,4 +138,4 @@ function ScanPage() {
   )
 }
 
-export default ScanPage;
+export default ScanUniPage;

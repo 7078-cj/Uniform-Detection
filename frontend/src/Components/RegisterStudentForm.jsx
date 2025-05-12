@@ -1,108 +1,200 @@
-import React from 'react'
+import React, { useState } from 'react';
+import {
+  Anchor,
+  Button,
+  Container,
+  Group,
+  Paper,
+  PasswordInput,
+  Text,
+  TextInput,
+  Title,
+  MantineProvider,
+  Stack,
+  Box,
+  Modal,
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
 
 function RegisterStudentForm() {
+  const [opened, setOpened] = useState(false);
 
-    var RegisterStudent = async(e) =>{
-        e.preventDefault();
+  const form = useForm({
+    initialValues: {
+      firstName: '',
+      middleInitial: '',
+      lastName: '',
+      studentCode: '',
+      course: '',
+      year_level: '',
+      email: '',
+      password: '',
+    },
+    validate: {
+      firstName: (value) => (value.length < 2 ? 'First name must have at least 2 letters' : null),
+      lastName: (value) => (value.length < 2 ? 'Last name must have at least 2 letters' : null),
+      studentCode: (value) => (value.length < 5 ? 'Student code must be at least 5 characters long' : null),
+      course: (value) => (value.length < 2 ? 'Please enter a valid course' : null),
+      year_level: (value) => (/^[1-5]$/.test(value) ? null : 'Year level must be between 1-5'),
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+      password: (value) =>
+        value.length < 8
+          ? 'Password must be at least 8 characters long'
+          : !/\d/.test(value)
+          ? 'Password must include at least one number'
+          : !/[a-z]/.test(value)
+          ? 'Password must include at least one lowercase letter'
+          : !/[A-Z]/.test(value)
+          ? 'Password must include at least one uppercase letter'
+          : null,
+    },
+  });
 
-        let response = await fetch(
-          "http://127.0.0.1:8000/api/students/",{
-            method: "POST",
-            headers:{
-              'Content-Type' : 'application/json',
-             
-            },
-            body :JSON.stringify({
-                                  'firstName' :e.target.firstName.value,
-                                  'middleInitial' :e.target.middleInitial.value,
-                                  'lastName' :e.target.lastName.value,
-                                  'studentCode' :e.target.studentCode.value,
-                                  'course' :e.target.course.value,
-                                  'year_level' :e.target.year_level.value,
-                                    'email':e.target.email.value,
-                                  'password' :e.target.password.value,
-                                  
-                                  })
-          }
-        )
-        let data = await response.json()
-                console.log(data)
-                if (response.status ==200){
-                  loginUser(e)
-                  nav('/')
+  const RegisterStudent = async (values) => {
+    try {
+      const formData = new FormData();
+      Object.entries(values).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      let response = await fetch('http://127.0.0.1:8000/api/students/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      let data = await response.json();
+
+      if (response.ok) {
+        setOpened(true);
+        form.reset();
+        console.log('Success: Registration successful!');
+        setTimeout(() => {
+          setOpened(false);
+          // loginUser(values); // Uncomment if defined
+          // nav('/'); // Uncomment if using useNavigate
+        }, 2000);
+      } else {
+        console.log('Registration Failed:', data.message || 'An error occurred during registration');
       }
-    }
+      } catch (error) {
+        console.log('Error: Network error or server is not responding');
+      }
+};    
 
   return (
-    <div className='flex flex-col justify-center items-center h-screen'>
-      
-      <form onSubmit={RegisterStudent} className="flex flex-col justify-center items-center space-y-2">
-        <input 
-          type="text" 
-          name="firstName" 
-          placeholder="Enter First Name" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300' 
-        />
+    <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: 'light', primaryColor: 'teal' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
+        <Container size="lg" my={40}>
+          <Paper radius="md" p="xl" withBorder>
+            <Title order={2} ta="center" mt="md" mb={50}>
+              Student Registration
+            </Title>
 
-        <input 
-          type="text" 
-          name="middleInitial" 
-          placeholder="Enter Middle Initial" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300' 
-        />
+            <form onSubmit={form.onSubmit(RegisterStudent)}>
+              <Stack spacing="lg">
+                <Modal
+                  opened={opened}
+                  onClose={() => setOpened(false)}
+                  title="Registration Successful"
+                  centered
+                  styles={{
+                    modal: {
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                    },
+                  }}
+                >
+                  <Text align="center" size="lg" weight={500}>
+                    Your registration was successful! 
+                  </Text>
+                </Modal>
 
-        <input 
-          type="text" 
-          name="lastName" 
-          placeholder="Enter Last Name" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300' 
-        />
+                <Group grow>
+                  <TextInput
+                    label="First Name"
+                    placeholder="Enter First Name"
+                    radius="md"
+                    size="md"
+                    required
+                    {...form.getInputProps('firstName')}
+                  />
+                  <TextInput
+                    label="Middle Initial"
+                    placeholder="Enter Middle Initial"
+                    radius="md"
+                    size="md"
+                    {...form.getInputProps('middleInitial')}
+                  />
+                  <TextInput
+                    label="Last Name"
+                    placeholder="Enter Last Name"
+                    radius="md"
+                    size="md"
+                    required
+                    {...form.getInputProps('lastName')}
+                  />
+                </Group>
 
-        <input 
-          type="text" 
-          name="studentCode" 
-          placeholder="Enter Student Code" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300' 
-        />
+                <Group grow>
+                  <TextInput
+                    label="Student Code"
+                    placeholder="Enter Student Code"
+                    radius="md"
+                    size="md"
+                    required
+                    {...form.getInputProps('studentCode')}
+                  />
+                  <TextInput
+                    label="Course"
+                    placeholder="Enter Student Course"
+                    radius="md"
+                    size="md"
+                    required
+                    {...form.getInputProps('course')}
+                  />
+                  <TextInput
+                    label="Year Level"
+                    placeholder="Enter Year Level"
+                    radius="md"
+                    size="md"
+                    required
+                    {...form.getInputProps('year_level')}
+                  />
+                </Group>
 
-        <input 
-          type="email" 
-          name="email" 
-          placeholder="Enter User Email" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300'  
-        />
-        <input 
-          type="password" 
-          name="password" 
-          placeholder="Enter Password" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300'  
-        />
+                <TextInput
+                  label="Email"
+                  type="email"
+                  placeholder="Enter User Email"
+                  radius="md"
+                  size="md"
+                  required
+                  {...form.getInputProps('email')}
+                />
 
-        <input 
-          type="text" 
-          name="course" 
-          placeholder="Enter Student Course" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300' 
-        />
+                <PasswordInput
+                  label="Password"
+                  placeholder="Enter Password"
+                  radius="md"
+                  size="md"
+                  required
+                  {...form.getInputProps('password')}
+                />
 
-        <input 
-          type="text" 
-          name="year_level"
-          placeholder="Enter Year Level" 
-          className='outline-none border-2 rounded-md px-2 py-1 text-slate-500 w-full focus:border-blue-300' 
-        />
+                <Button type="submit" size="md" radius="md" fullWidth mt="xl">
+                  Register
+                </Button>
 
-        <input 
-          type="submit" 
-          value="Register" 
-          className='w-full justify-center py-1 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-md text-white ring-2'  
-        />
-    </form>
-    
- 
-      
-    </div>
-  )
+              
+              </Stack>
+            </form>
+          </Paper>
+        </Container>
+      </Box>
+    </MantineProvider>
+  );
 }
 
-export default RegisterStudentForm
+export default RegisterStudentForm;
