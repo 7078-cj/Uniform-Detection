@@ -1,0 +1,36 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  margin-bottom: 2rem;
+  color: var(--mantine-color-teal-7);
+  text-align: center;
+  font-weight: 600;
+}
+
+.statusCard {
+  transition: all 0.3s ease;
+  border: 1px solid var(--mantine-color-gray-3);
+}
+
+.statusCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--mantine-color-teal-5);
+}
+
+.validationMessage {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.validationSuccess {
+  color: var(--mantine-color-teal-6);
+}
+
+.validationError {
+  color: var(--mantine-color-red-6);
+}

@@ -1,26 +1,32 @@
-import React, { useState } from 'react'
-import NavBar from '../Components/NavBar'
-import RegisterStudentForm from '../Components/RegisterStudentForm'
-import ScanPage from '../Components/ScanPage'
+import React, { useState } from "react";
+import NavBar from "../Components/NavBar";
+import RegisterStudentForm from "../Components/RegisterStudentForm";
+import ScanPage from "../Components/ScanPage";
+import Analytics from "../Components/Analytics";
+import ScanUniPage from "../Components/ScanUniPage";
+import UniformStatusPage from "../Components/UniformStatusPage";
 
 function AdminPage() {
-
-  const [page, setPage] = useState("home")
+  const [page, setPage] = useState("home");
 
   return (
     <>
-        <NavBar setPage={setPage}></NavBar>
-        { page === "home" ? 
-          (<div>AdminPage</div>) : 
-          page === "scan" ? 
-          (<ScanPage/>) : 
-          page === "registerStudent" ? 
-          ( <RegisterStudentForm/>) : 
-          (<div></div>) 
-        }
-       
+      <NavBar setPage={setPage}></NavBar>
+      {page === "home" ? (
+        <Analytics />
+      ) : page === "scanId" ? (
+        <ScanPage />
+      ) : page === "scanUni" ? (
+        <ScanUniPage />
+      ) : page === "status" ? (
+        <UniformStatusPage />
+      ) : page === "registerStudent" ? (
+        <RegisterStudentForm />
+      ) : (
+        <div></div>
+      )}
     </>
-  )
+  );
 }
 
-export default AdminPage
+export default AdminPage;
