@@ -39,7 +39,7 @@ function ScanPage() {
     
           try {
             const response = await fetch(
-              "http://127.0.0.1:8000/api/scan/",
+              "http://127.0.0.1:8000/api/scan/qr",
               { method: "POST", body: formData }
             );
             const result = await response.json();

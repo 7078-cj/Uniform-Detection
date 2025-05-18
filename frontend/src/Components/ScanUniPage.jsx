@@ -10,6 +10,33 @@ function ScanUniPage() {
     const [isScanning, setIsScanning] = useState(false);
     const [validationResult, setValidationResult] = useState(null);
 
+    // for debugging purpose
+    const [image, setImage] = useState(null);
+    const [resultImage, setResultImage] = useState(null);
+
+    const handleImageChange = (e) => {
+      setImage(e.target.files[0]);
+    };
+
+    const handleSubmit = async () => {
+      const formData = new FormData();
+      formData.append('image', image);
+
+      const res = await fetch('http://127.0.0.1:8000/api/scan/unif', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      console.log(data);
+      
+      setResultImage(`data:image/jpeg;base64,${data.image}`);
+      
+    };
+    // ---------------------------------------
+
+
+
     const scanImage = async () => {
         setIsScanning(true);
         setValidationResult(null);
@@ -39,11 +66,12 @@ function ScanUniPage() {
     
           try {
             const response = await fetch(
-              "http://127.0.0.1:8000/api/scan/",
+              "http://127.0.0.1:8000/api/scan/unif",
               { method: "POST", body: formData }
             );
             const result = await response.json();
             console.log(result);
+            setResultImage(`data:image/jpeg;base64,${result.image}`);
             
             if (!response.ok) {
               const errorMessage = result.error || 'Failed to process the scan';
@@ -100,8 +128,8 @@ function ScanUniPage() {
             width={860}
             height={600}
             videoConstraints={{
-              width: 560,
-              height: 400,
+              width: 4080,
+              height: 3060,
               facingMode: "user",
             }}
           />
@@ -133,6 +161,25 @@ function ScanUniPage() {
           {isScanning ? 'Scanning...' : validationResult?.success === false ? 'Try Again' : 'Scan Uniform'}
         </Button>
       </Paper>
+
+      {/* for debugging purpose */}
+        <div>
+        <h2>Upload Image for Uniform Detection</h2>
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        <button onClick={handleSubmit}>Submit</button>
+        <div className="w-[200px] h-[200px]">
+        {resultImage && (
+          <div>
+            <h3>Detection Result</h3>
+            <img
+              src={resultImage}
+              alt="Detected Frame"
+              className="w-[200px] h-[200px] object-contain rounded bg-gray-100"
+            />
+          </div>
+        )}
+        </div>
+      </div>
     </div>
 
   )

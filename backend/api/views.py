@@ -10,9 +10,11 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated
 from .models import Student, StudentQR, StudentAttendance
 from django.shortcuts import get_object_or_404
+import base64
+import cv2
 from django.contrib.auth.models import User
 
-from .utils import generate_and_save_qr_to_model, qr_scanner
+from .utils import generate_and_save_qr_to_model, qr_scanner , uniform_scanner
 
 # Create your views here.
 
@@ -114,3 +116,20 @@ def qr_scanner_view(request):
         return Response(serializer.data, status=200)
     else:
         return Response({'error': 'Student not found'}, status=404)
+    
+@api_view(['POST'])
+def uniform_scanner_view(request):
+    image_file = request.FILES.get("image")
+    if not image_file:
+        return Response({'error': 'No file provided'}, status=400)
+
+    frame, detectedObjects = uniform_scanner(image_file)
+    if frame is None:
+        return Response({'error': 'Failed to process image'}, status=500)
+
+
+    _, buffer = cv2.imencode('.jpg', frame)
+    jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+
+    return Response({'image': jpg_as_text, "detectedObjects": detectedObjects}, status=200)
+    

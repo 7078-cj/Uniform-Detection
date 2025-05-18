@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Student, StudentAttendance, StudentQR
+from .models import Student, StudentAttendance, StudentQR, StudentLogs
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,3 +35,10 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
+        
+class StudentLogsSerializer(serializers.ModelSerializer):
+    student = StudentSerializer(read_only=True)
+    class Meta:
+        model = StudentLogs
+        fields = '__all__'
+        read_only_fields = ['student']

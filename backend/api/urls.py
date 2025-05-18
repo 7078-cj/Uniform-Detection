@@ -13,7 +13,8 @@ urlpatterns = [
     path('register/',views.registerUser),
     path('students/', views.StudentView.as_view()),
     path('student/<str:pk>/', views.StudentDetailView.as_view()),
-    path('scan/', views.qr_scanner_view),
+    path('scan/qr', views.qr_scanner_view),
+    path('scan/unif', views.uniform_scanner_view),
   
 ]
 
