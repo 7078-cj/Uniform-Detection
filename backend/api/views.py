@@ -13,6 +13,10 @@ from django.shortcuts import get_object_or_404
 import base64
 import cv2
 from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
+from django.conf import settings
+
+import io
 
 from .utils import generate_and_save_qr_to_model, qr_scanner , uniform_scanner
 
@@ -122,12 +126,22 @@ def uniform_scanner_view(request):
     image_file = request.FILES.get("image")
     if not image_file:
         return Response({'error': 'No file provided'}, status=400)
+    
+    
 
     frame, detectedObjects = uniform_scanner(image_file)
     if frame is None:
         return Response({'error': 'Failed to process image'}, status=500)
 
-
+    email = EmailMessage(
+        subject='Uniform Scanner Result',
+        body='Detected objects: {}'.format(detectedObjects),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=['lovelypintes@gmail.com','faceless7078@gmail.com'],
+    )
+    email.attach('image.jpg', image_file.read(), 'image/jpeg')
+    email.send()
+    
     _, buffer = cv2.imencode('.jpg', frame)
     jpg_as_text = base64.b64encode(buffer).decode('utf-8')
 
