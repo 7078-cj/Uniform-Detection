@@ -83,7 +83,7 @@ class StudentView(ListCreateAPIView):
         )
         Student = serializer.save(user=user)
         instance = StudentQR.objects.create(student=Student)
-        generate_and_save_qr_to_model(Student.studentCode, instance)
+        generate_and_save_qr_to_model(Student.studentCode, instance, Student)
         instance.save()
         
         
@@ -122,14 +122,23 @@ def qr_scanner_view(request):
         return Response({'error': 'Student not found'}, status=404)
     
 @api_view(['POST'])
-def uniform_scanner_view(request):
+def uniform_scanner_view(request,pk):
+    
+    print(request.data)
+    
+    student = get_object_or_404(Student, id=pk)
+    if not student:
+        return Response({'error': 'Student not found'}, status=404)
+    
     image_file = request.FILES.get("image")
     if not image_file:
         return Response({'error': 'No file provided'}, status=400)
     
+   
+    image_bytes = image_file.read()
     
 
-    frame, detectedObjects = uniform_scanner(image_file)
+    frame, detectedObjects = uniform_scanner(image_file,student)
     if frame is None:
         return Response({'error': 'Failed to process image'}, status=500)
 
@@ -139,7 +148,7 @@ def uniform_scanner_view(request):
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=['lovelypintes@gmail.com','faceless7078@gmail.com'],
     )
-    email.attach('image.jpg', image_file.read(), 'image/jpeg')
+    email.attach('image.jpg', image_bytes, 'image/jpeg')
     email.send()
     
     _, buffer = cv2.imencode('.jpg', frame)

@@ -4,11 +4,13 @@ import { Paper, Button, Title, Loader, Text } from "@mantine/core";
 // import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import classes from "../css/Scanner.module.css";
+import ScanUniPage from './ScanUniPage';
 
 function ScanPage() {
     const webcamRef = useRef(null);
     const [isScanning, setIsScanning] = useState(false);
     const [validationResult, setValidationResult] = useState(null);
+    const [student, setStudent] = useState(null);
 
     const scanImage = async () => {
         setIsScanning(true);
@@ -18,12 +20,6 @@ function ScanPage() {
           if (!imageSrc) {
             setIsScanning(false);
             console.error("Failed to capture image from webcam.");
-            // showNotification({
-            //   title: "Scan Failed",
-            //   message: "Unable to capture image from webcam.",
-            //   color: "red",
-            //   icon: <IconX size={16} />,
-            // });
             return;
           }
     
@@ -51,12 +47,6 @@ function ScanPage() {
                 success: false,
                 message: errorMessage
               });
-              // showNotification({
-              //   title: "Scan Error",
-              //   message: errorMessage,
-              //   color: "red",
-              //   icon: <IconX size={16} />,
-              // });
               setIsScanning(false);
               return;
             }
@@ -65,12 +55,8 @@ function ScanPage() {
               success: true,
               message: `Student ID validated: ${result.fullName}`
             });
-            // showNotification({
-            //   title: "Scan Successful",
-            //   message: "QR code scanned and validated successfully.",
-            //   color: "green",
-            //   icon: <IconCheck size={16} />,
-            // });
+            setStudent(result);
+    
           } catch (error) {
             console.error("Error processing image:", error);
             console.error('Scan error:', error);
@@ -78,62 +64,58 @@ function ScanPage() {
               success: false,
               message: "Network error or invalid response format"
             });
-            // showNotification({
-            //   title: "Scan Error",
-            //   message: "Failed to communicate with the server. Please try again.",
-            //   color: "red",
-            //   icon: <IconX size={16} />,
-            // });
           }
         }
         setIsScanning(false);
       };
 
   return (
-    <div className={classes.scannerContainer}>
-      <Title className={classes.scannerTitle} order={3}>Student ID Scanner</Title>
-      <Paper shadow="lg" radius="lg" p="xl" withBorder>
-        <div className={classes.webcamContainer}>
-          <Webcam
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            width={560}
-            height={400}
-            videoConstraints={{
-              width: 560,
-              height: 400,
-              facingMode: "user",
-            }}
-          />
-          <div className={classes.scanOverlay} />
-          <div className={`${classes.scannerCorner} ${classes.topLeft}`} />
-          <div className={`${classes.scannerCorner} ${classes.topRight}`} />
-          <div className={`${classes.scannerCorner} ${classes.bottomLeft}`} />
-          <div className={`${classes.scannerCorner} ${classes.bottomRight}`} />
-          {isScanning && (
-            <div className={classes.loadingOverlay}>
-              <Loader color="teal" size="lg" />
-            </div>
+    <>
+      {!student ? (<div className={classes.scannerContainer}>
+        <Title className={classes.scannerTitle} order={3}>Student ID Scanner</Title>
+        <Paper shadow="lg" radius="lg" p="xl" withBorder>
+          <div className={classes.webcamContainer}>
+            <Webcam
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              width={560}
+              height={400}
+              videoConstraints={{
+                width: 560,
+                height: 400,
+                facingMode: "user",
+              }}
+            />
+            <div className={classes.scanOverlay} />
+            <div className={`${classes.scannerCorner} ${classes.topLeft}`} />
+            <div className={`${classes.scannerCorner} ${classes.topRight}`} />
+            <div className={`${classes.scannerCorner} ${classes.bottomLeft}`} />
+            <div className={`${classes.scannerCorner} ${classes.bottomRight}`} />
+            {isScanning && (
+              <div className={classes.loadingOverlay}>
+                <Loader color="teal" size="lg" />
+              </div>
+            )}
+          </div>
+          {validationResult && (
+            <Text className={`${classes.validationMessage} ${validationResult.success ? classes.validationSuccess : classes.validationError}`}>
+              {validationResult.message}
+            </Text>
           )}
-        </div>
-        {validationResult && (
-          <Text className={`${classes.validationMessage} ${validationResult.success ? classes.validationSuccess : classes.validationError}`}>
-            {validationResult.message}
-          </Text>
-        )}
-        <Button
-          className={classes.scanButton}
-          fullWidth
-          radius="md"
-          size="lg"
-          onClick={scanImage}
-          loading={isScanning}
-          color={validationResult?.success === false ? "red" : "teal"}
-        >
-          {isScanning ? 'Scanning...' : validationResult?.success === false ? 'Try Again' : 'Scan ID'}
-        </Button>
-      </Paper>
-    </div>
+          <Button
+            className={classes.scanButton}
+            fullWidth
+            radius="md"
+            size="lg"
+            onClick={scanImage}
+            loading={isScanning}
+            color={validationResult?.success === false ? "red" : "teal"}
+          >
+            {isScanning ? 'Scanning...' : validationResult?.success === false ? 'Try Again' : 'Scan ID'}
+          </Button>
+        </Paper>
+      </div>):<ScanUniPage student={student} setStudent={setStudent}/>}
+    </>
 
   )
 }

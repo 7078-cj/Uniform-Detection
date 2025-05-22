@@ -5,10 +5,11 @@ import { Paper, Button, Title, Loader, Text } from "@mantine/core";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import classes from "../css/Scanner.module.css";
 
-function ScanUniPage() {
+function ScanUniPage({student, setStudent}) {
     const webcamRef = useRef(null);
     const [isScanning, setIsScanning] = useState(false);
     const [validationResult, setValidationResult] = useState(null);
+    const [isNextStudent, setIsNextStudent] = useState(false);
 
     // for debugging purpose
     const [image, setImage] = useState(null);
@@ -45,12 +46,6 @@ function ScanUniPage() {
           if (!imageSrc) {
             setIsScanning(false);
             console.error("Failed to capture image from webcam.");
-            // showNotification({
-            //   title: "Scan Failed",
-            //   message: "Unable to capture image from webcam.",
-            //   color: "red",
-            //   icon: <IconX size={16} />,
-            // });
             return;
           }
     
@@ -63,10 +58,11 @@ function ScanUniPage() {
     
           const formData = new FormData();
           formData.append("image", blob, "snapshot.png");
+          formData.append("student_id", student.id);
     
           try {
             const response = await fetch(
-              "http://127.0.0.1:8000/api/scan/unif",
+              `http://127.0.0.1:8000/api/scan/unif/${student.id}/`,
               { method: "POST", body: formData }
             );
             const result = await response.json();
@@ -79,12 +75,6 @@ function ScanUniPage() {
                 success: false,
                 message: errorMessage
               });
-              // showNotification({
-              //   title: "Scan Error",
-              //   message: errorMessage,
-              //   color: "red",
-              //   icon: <IconX size={16} />,
-              // });
               setIsScanning(false);
               return;
             }
@@ -93,12 +83,11 @@ function ScanUniPage() {
               success: true,
               message: `Student Uniform validated: ${result.fullName}`
             });
-            // showNotification({
-            //   title: "Scan Successful",
-            //   message: "QR code scanned and validated successfully.",
-            //   color: "green",
-            //   icon: <IconCheck size={16} />,
-            // });
+
+            setIsNextStudent(true);
+
+            
+            
           } catch (error) {
             console.error("Error processing image:", error);
             console.error('Scan error:', error);
@@ -160,6 +149,21 @@ function ScanUniPage() {
         >
           {isScanning ? 'Scanning...' : validationResult?.success === false ? 'Try Again' : 'Scan Uniform'}
         </Button>
+        {isNextStudent && (
+          <Button
+            className={classes.scanButton}
+            fullWidth
+            radius="md"
+            size="lg"
+            onClick={() => {
+              setStudent(null);
+              setIsNextStudent(false);
+            }}
+            color="teal"
+          >
+            Next Student
+          </Button>
+        )}
       </Paper>
 
       {/* for debugging purpose */}

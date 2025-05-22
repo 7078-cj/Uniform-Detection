@@ -16,9 +16,7 @@ function AdminPage() {
         <Analytics />
       ) : page === "scanId" ? (
         <ScanPage />
-      ) : page === "scanUni" ? (
-        <ScanUniPage />
-      ) : page === "status" ? (
+      )  : page === "status" ? (
         <UniformStatusPage />
       ) : page === "registerStudent" ? (
         <RegisterStudentForm />

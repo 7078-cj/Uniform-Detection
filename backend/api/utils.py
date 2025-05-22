@@ -6,10 +6,14 @@ from django.core.files import File
 import numpy as np
 from ultralytics import YOLO
 import os
+from django.core.mail import EmailMessage
+from django.conf import settings
+from .models import Student, StudentLogs
+from django.utils import timezone
 
 
 
-def generate_and_save_qr_to_model(data, instance):
+def generate_and_save_qr_to_model(data, instance,student):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -23,7 +27,20 @@ def generate_and_save_qr_to_model(data, instance):
     buffer = BytesIO()
     img.save(buffer, format='PNG')
     buffer.seek(0)
+    
+    email = EmailMessage(
+        subject='Uniform Scanner Result',
+        body=f'An Account has been created for you with the following details:\n\n'
+             f'Username: {student.user.username}\n'
+             f'Email: {student.email}\n\n'
+             f'Please use the QR code attached to this email for your attendance.',
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=['faceless7078@gmail.com',student.email],
+    )
+    email.attach('qr_code.png', buffer.read(), 'image/png')
 
+    email.send()
+    buffer.seek(0)
     instance.qr_code.save(f"{data}.png", File(buffer), save=False)
     
     
@@ -40,13 +57,8 @@ def qr_scanner(img_file):
     
     return decoded
 
-def uniform_scanner(img_file):
-    import os
-    import cv2
-    import numpy as np
-    from ultralytics import YOLO
-
-   
+def uniform_scanner(img_file,student):
+    
     img_array = np.frombuffer(img_file.read(), np.uint8)
     frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
@@ -80,6 +92,55 @@ def uniform_scanner(img_file):
         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(frame, label, (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        
+    class_name = model.names[cls]
+    if class_name == "CompleteUniform":
+        StudentLogs.objects.create(
+            student=student, 
+            description="Detected in full uniform via scanner",
+            timestamp=timezone.now()
+        )
+        
+    else:
+        StudentLogs.objects.create(
+            student=student, 
+            description="Detected in incomplete uniform via scanner",
+            timestamp=timezone.now()
+        )
+        
+    _, jpeg = cv2.imencode('.jpg', frame)
+    jpeg_bytes = jpeg.tobytes()
+    buffer = BytesIO(jpeg_bytes)
+    buffer.seek(0)
+    
+
+   
+    uniform_status = "Complete Uniform Detected" if class_name == "CompleteUniform" else "Incomplete or No Uniform Detected"
+
+    
+    if detected_objects:
+        object_summary = "\n".join([f"- {obj['label']} at {obj['bbox']}" for obj in detected_objects])
+    else:
+        object_summary = "No uniform-related objects were detected in the scan."
+
+    # Compose the email
+    email = EmailMessage(
+        subject='[Uniform Scanner] Detection Summary',
+        body=(
+            f"Dear {student.full_name},\n\n"
+            f"This is to inform you that your recent scan has been processed.\n\n"
+            f"Detection Result: **{uniform_status}**\n\n"
+            f"Details:\n{object_summary}\n\n"
+            f"If this detection appears incorrect, please contact your supervisor.\n\n"
+            f"Regards,\nUniform Monitoring System"
+        ),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=['faceless7078@gmail.com', student.email],
+    )
+
+    # Attach the image of the detection result
+    email.attach('detected.jpg', buffer.read(), 'image/jpeg')
+    email.send()
 
     return frame, detected_objects 
 

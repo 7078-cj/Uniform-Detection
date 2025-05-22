@@ -24,7 +24,6 @@ function NavBar({ setPage }) {
   const adminTabs = [
     { label: "Home", value: "home" },
     { label: "Scan ID", value: "scanId" },
-    { label: "Scan Uniform", value: "scanUni" },
     { label: "Student Log", value: "status" },
     { label: "Register Student", value: "registerStudent" },
   ];
