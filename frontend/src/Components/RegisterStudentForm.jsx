@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
+  Anchor,
   Button,
   Container,
   Group,
@@ -12,49 +13,39 @@ import {
   Stack,
   Box,
   Modal,
-  Select,
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
 
 function RegisterStudentForm() {
   const [opened, setOpened] = useState(false);
 
   const form = useForm({
     initialValues: {
-      firstName: "",
-      middleInitial: "",
-      lastName: "",
-      studentCode: "",
-      course: "",
-      year_level: "",
-      email: "",
-      password: "",
+      firstName: '',
+      middleInitial: '',
+      lastName: '',
+      studentCode: '',
+      course: '',
+      year_level: '',
+      email: '',
+      password: '',
     },
     validate: {
-      firstName: (value) =>
-        value.length < 2 ? "First name must have at least 2 letters" : null,
-      lastName: (value) =>
-        value.length < 2 ? "Last name must have at least 2 letters" : null,
-      studentCode: (value) =>
-        value.length < 5
-          ? "Student code must be at least 5 characters long"
-          : null,
-      course: (value) =>
-        value.length < 2 ? "Please enter a valid course" : null,
-      year_level: (value) =>
-        ["1", "2", "3", "4", "5"].includes(value)
-          ? null
-          : "Year level must be between 1 and 5",
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      firstName: (value) => (value.length < 2 ? 'First name must have at least 2 letters' : null),
+      lastName: (value) => (value.length < 2 ? 'Last name must have at least 2 letters' : null),
+      studentCode: (value) => (value.length < 5 ? 'Student code must be at least 5 characters long' : null),
+      course: (value) => (value.length < 2 ? 'Please enter a valid course' : null),
+      year_level: (value) => (/^[1-5]$/.test(value) ? null : 'Year level must be between 1-5'),
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
       password: (value) =>
         value.length < 8
-          ? "Password must be at least 8 characters long"
+          ? 'Password must be at least 8 characters long'
           : !/\d/.test(value)
-          ? "Password must include at least one number"
+          ? 'Password must include at least one number'
           : !/[a-z]/.test(value)
-          ? "Password must include at least one lowercase letter"
+          ? 'Password must include at least one lowercase letter'
           : !/[A-Z]/.test(value)
-          ? "Password must include at least one uppercase letter"
+          ? 'Password must include at least one uppercase letter'
           : null,
     },
   });
@@ -66,8 +57,8 @@ function RegisterStudentForm() {
         formData.append(key, value);
       });
 
-      let response = await fetch("http://127.0.0.1:8000/api/students/", {
-        method: "POST",
+      let response = await fetch('http://127.0.0.1:8000/api/students/', {
+        method: 'POST',
         body: formData,
       });
 
@@ -76,36 +67,23 @@ function RegisterStudentForm() {
       if (response.ok) {
         setOpened(true);
         form.reset();
-        console.log("Success: Registration successful!");
+        console.log('Success: Registration successful!');
         setTimeout(() => {
           setOpened(false);
-          
+          // loginUser(values); // Uncomment if defined
+          // nav('/'); // Uncomment if using useNavigate
         }, 2000);
       } else {
-        console.log(
-          "Registration Failed:",
-          data.message || "An error occurred during registration"
-        );
+        console.log('Registration Failed:', data.message || 'An error occurred during registration');
       }
-    } catch (error) {
-      console.log("Error: Network error or server is not responding", error);
-    }
-  };
+      } catch (error) {
+        console.log('Error: Network error or server is not responding');
+      }
+};    
 
   return (
-    <MantineProvider
-      withGlobalStyles
-      withNormalizeCSS
-      theme={{ colorScheme: "light", primaryColor: "teal" }}
-    >
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: "#f8f9fa",
-        }}
-      >
+    <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: 'light', primaryColor: 'teal' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
         <Container size="lg" my={40}>
           <Paper radius="md" p="xl" withBorder>
             <Title order={2} ta="center" mt="md" mb={50}>
@@ -121,15 +99,15 @@ function RegisterStudentForm() {
                   centered
                   styles={{
                     modal: {
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
                     },
                   }}
                 >
                   <Text align="center" size="lg" weight={500}>
-                    Your registration was successful!
+                    Your registration was successful! 
                   </Text>
                 </Modal>
 
@@ -140,14 +118,14 @@ function RegisterStudentForm() {
                     radius="md"
                     size="md"
                     required
-                    {...form.getInputProps("firstName")}
+                    {...form.getInputProps('firstName')}
                   />
                   <TextInput
                     label="Middle Initial"
                     placeholder="Enter Middle Initial"
                     radius="md"
                     size="md"
-                    {...form.getInputProps("middleInitial")}
+                    {...form.getInputProps('middleInitial')}
                   />
                   <TextInput
                     label="Last Name"
@@ -155,7 +133,7 @@ function RegisterStudentForm() {
                     radius="md"
                     size="md"
                     required
-                    {...form.getInputProps("lastName")}
+                    {...form.getInputProps('lastName')}
                   />
                 </Group>
 
@@ -166,39 +144,23 @@ function RegisterStudentForm() {
                     radius="md"
                     size="md"
                     required
-                    {...form.getInputProps("studentCode")}
+                    {...form.getInputProps('studentCode')}
                   />
-
-                  <Select
+                  <TextInput
                     label="Course"
-                    placeholder="Select Student Course"
+                    placeholder="Enter Student Course"
                     radius="md"
                     size="md"
                     required
-                    data={[
-                      { value: "BSIT", label: "BSIT" },
-                      { value: "BSCS", label: "BSCS" },
-                      { value: "BSIS", label: "BSIS" },
-                      { value: "BSECE", label: "BSECE" },
-                      { value: "BSA", label: "BSA" },
-                    ]}
-                    {...form.getInputProps("course")}
+                    {...form.getInputProps('course')}
                   />
-
-                  <Select
+                  <TextInput
                     label="Year Level"
-                    placeholder="Select Year Level"
+                    placeholder="Enter Year Level"
                     radius="md"
                     size="md"
                     required
-                    data={[
-                      { value: "1", label: "1st Year" },
-                      { value: "2", label: "2nd Year" },
-                      { value: "3", label: "3rd Year" },
-                      { value: "4", label: "4th Year" },
-                      { value: "5", label: "5th Year" },
-                    ]}
-                    {...form.getInputProps("year_level")}
+                    {...form.getInputProps('year_level')}
                   />
                 </Group>
 
@@ -209,7 +171,7 @@ function RegisterStudentForm() {
                   radius="md"
                   size="md"
                   required
-                  {...form.getInputProps("email")}
+                  {...form.getInputProps('email')}
                 />
 
                 <PasswordInput
@@ -218,12 +180,14 @@ function RegisterStudentForm() {
                   radius="md"
                   size="md"
                   required
-                  {...form.getInputProps("password")}
+                  {...form.getInputProps('password')}
                 />
 
                 <Button type="submit" size="md" radius="md" fullWidth mt="xl">
                   Register
                 </Button>
+
+              
               </Stack>
             </form>
           </Paper>

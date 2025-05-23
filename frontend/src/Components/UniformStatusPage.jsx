@@ -3,20 +3,6 @@ import { Paper, Title, Text, Stack, Group, Badge, Collapse, ActionIcon } from '@
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import classes from '../css/UniformStatus.module.css';
 
-// function to format date & time in "Jan 28, 2020, 10:30 AM" format
-const formatDateTime = (isoString) => {
-  if (!isoString) return 'N/A';
-  const date = new Date(isoString);
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
-};
-
 function UniformStatusPage() {
   const [statusList, setStatusList] = useState([]);
 
@@ -29,7 +15,7 @@ function UniformStatusPage() {
       course: 'BSIT',
       yearLevel: '3rd Year',
       violations: [],
-      lastViolation: null,
+      lastViolation: null
     },
     {
       studentName: 'Jane Smith',
@@ -38,8 +24,8 @@ function UniformStatusPage() {
       isProper: false,
       course: 'BSCS',
       yearLevel: '2nd Year',
-      violations: [],
-      lastViolation: '2024-03-10T00:00:00Z',
+      violations: ['Improper Shoes', 'Missing ID'],
+      lastViolation: '2024-03-10'
     },
     {
       studentName: 'Mark Johnson',
@@ -48,8 +34,8 @@ function UniformStatusPage() {
       isProper: true,
       course: 'BSIS',
       yearLevel: '4th Year',
-      violations: [],
-      lastViolation: '2024-02-28T00:00:00Z',
+      violations: ['Untucked Shirt'],
+      lastViolation: '2024-02-28'
     },
   ];
 
@@ -89,11 +75,6 @@ function UniformStatusPage() {
     <div className={classes.container}>
       <Title order={2} className={classes.title}>Student Uniform Status</Title>
       <Stack spacing="md">
-        {statusList.length === 0 && (
-          <Text align="center" color="dimmed">
-            No uniform status records found
-          </Text>
-        )}
         {statusList.map((status, index) => (
           <Paper
             key={index}
@@ -112,7 +93,7 @@ function UniformStatusPage() {
                   </Badge>
                 </Group>
                 <Text size="sm" color="dimmed">{status.studentId}</Text>
-                <Text size="sm">{formatDateTime(status.timestamp)}</Text>
+                <Text size="sm">{new Date(status.timestamp).toLocaleString()}</Text>
               </div>
               <Group spacing="sm">
                 <Badge
@@ -144,7 +125,7 @@ function UniformStatusPage() {
                   </div>
                   <div>
                     <Text size="sm" weight={500}>Last Violation</Text>
-                    <Text size="sm">{formatDateTime(status.lastViolation) || 'No violations'}</Text>
+                    <Text size="sm">{status.lastViolation || 'No violations'}</Text>
                   </div>
                 </Group>
                 {status.violations && status.violations.length > 0 && (
@@ -163,6 +144,11 @@ function UniformStatusPage() {
             </Collapse>
           </Paper>
         ))}
+        {statusList.length === 0 && (
+          <Text align="center" color="dimmed">
+            No uniform status records found
+          </Text>
+        )}
       </Stack>
     </div>
   );
