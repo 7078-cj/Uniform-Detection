@@ -23,7 +23,7 @@ function ScanUniPage({student, setStudent}) {
       const formData = new FormData();
       formData.append('image', image);
 
-      const res = await fetch(`http://127.0.0.1:8000/api/scan/unif/${student.id}/`, {
+      const res = await fetch( `http://127.0.0.1:8000/api/scan/unif/${student.id}/`, {
         method: 'POST',
         body: formData,
       });
