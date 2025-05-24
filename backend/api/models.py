@@ -36,7 +36,7 @@ class StudentAttendance(models.Model):
 
 class StudentLogs(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="student_logs")
-    log_type = models.CharField(max_length=10, choices=[('IN', 'IN'), ('OUT', 'OUT')])
     log_type = models.CharField(max_length=20, choices=[('CU', 'Complete Uniform'), ('IU', 'Incomplete Uniform')])
+    timestamp = models.DateTimeField(auto_now_add=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
