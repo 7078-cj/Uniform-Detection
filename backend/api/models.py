@@ -1,6 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Course(models.Model):
+    name = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
 # Create your models here.
 class Student(models.Model):
     firstName = models.CharField(max_length=50)
@@ -9,7 +17,7 @@ class Student(models.Model):
     studentCode = models.CharField(max_length=10)
     email = models.EmailField()
     password = models.CharField(max_length=20)
-    course = models.CharField(max_length=20)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="students", null=True, blank=True)
     year_level = models.IntegerField()
     update = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
