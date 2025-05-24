@@ -34,7 +34,7 @@ function RegisterStudentForm() {
       firstName: (value) => (value.length < 2 ? 'First name must have at least 2 letters' : null),
       lastName: (value) => (value.length < 2 ? 'Last name must have at least 2 letters' : null),
       studentCode: (value) => (value.length < 5 ? 'Student code must be at least 5 characters long' : null),
-      course: (value) => (value.length < 2 ? 'Please enter a valid course' : null),
+      
       year_level: (value) => (/^[1-5]$/.test(value) ? null : 'Year level must be between 1-5'),
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
       password: (value) =>

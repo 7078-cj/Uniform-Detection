@@ -58,7 +58,7 @@ def qr_scanner(img_file):
     return decoded
 
 def uniform_scanner(img_file,student):
-    
+    img_file.seek(0)
     img_array = np.frombuffer(img_file.read(), np.uint8)
     frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
@@ -93,29 +93,38 @@ def uniform_scanner(img_file,student):
         cv2.putText(frame, label, (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         
-    class_name = model.names[cls]
-    if class_name == "CompleteUniform":
-        StudentLogs.objects.create(
-            student=student, 
-            description="Detected in full uniform via scanner",
-            timestamp=timezone.now()
-        )
+    if detected_objects:
+        
+        cls = detected_objects[-1]['class_id']
+        class_name = model.names[cls]
+
+        if class_name == "CompleteUniform":
+            StudentLogs.objects.create(
+                student=student, 
+                log_type='CU',
+                timestamp=timezone.now()
+            )
+        else:
+            StudentLogs.objects.create(
+                student=student, 
+                log_type='IU',
+                timestamp=timezone.now()
+            )
         
     else:
+        uniform_status = "No Uniform Detected"
         StudentLogs.objects.create(
-            student=student, 
-            description="Detected in incomplete uniform via scanner",
-            timestamp=timezone.now()
-        )
+                student=student, 
+                log_type='IU',
+                timestamp=timezone.now()
+            )
         
     _, jpeg = cv2.imencode('.jpg', frame)
     jpeg_bytes = jpeg.tobytes()
     buffer = BytesIO(jpeg_bytes)
     buffer.seek(0)
     
-
-   
-    uniform_status = "Complete Uniform Detected" if class_name == "CompleteUniform" else "Incomplete or No Uniform Detected"
+    uniform_status = "Uniform Detected" if detected_objects else "No Uniform Detected"
 
     
     if detected_objects:
@@ -127,7 +136,7 @@ def uniform_scanner(img_file,student):
     email = EmailMessage(
         subject='[Uniform Scanner] Detection Summary',
         body=(
-            f"Dear {student.full_name},\n\n"
+            f"Dear {student.fullName},\n\n"
             f"This is to inform you that your recent scan has been processed.\n\n"
             f"Detection Result: **{uniform_status}**\n\n"
             f"Details:\n{object_summary}\n\n"
