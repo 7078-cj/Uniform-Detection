@@ -131,6 +131,7 @@ def uniform_scanner_view(request,pk):
         return Response({'error': 'Student not found'}, status=404)
     
     image_file = request.FILES.get("image")
+    
     if not image_file:
         return Response({'error': 'No file provided'}, status=400)
     
