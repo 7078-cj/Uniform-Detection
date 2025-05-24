@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  Anchor,
   Button,
   Container,
   Group,
@@ -13,8 +12,9 @@ import {
   Stack,
   Box,
   Modal,
-} from '@mantine/core';
-import { useForm } from '@mantine/form';
+  Select,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
 
 function RegisterStudentForm() {
   const [opened, setOpened] = useState(false);
